@@ -34,16 +34,24 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests((authorize) -> {
+                .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers("/api/auth/**").permitAll();
-                    authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    authorize.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/api/v1/members/**").hasAnyRole("USER", "ADMIN");
+                    authorize.requestMatchers(HttpMethod.POST, "/api/v1/members/**").hasRole("ADMIN");
+                    authorize.requestMatchers(HttpMethod.PUT, "/api/v1/members/**").hasRole("ADMIN");
+                    authorize.requestMatchers(HttpMethod.DELETE, "/api/v1/members/**").hasRole("ADMIN");
                     authorize.anyRequest().authenticated();
-                }).httpBasic(Customizer.withDefaults());
-        http.exceptionHandling( exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint));
+                })
+                .httpBasic(Customizer.withDefaults());
+
+        http.exceptionHandling(exception ->
+                exception.authenticationEntryPoint(authenticationEntryPoint));
+
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {

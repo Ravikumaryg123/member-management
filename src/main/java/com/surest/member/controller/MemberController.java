@@ -1,6 +1,7 @@
 package com.surest.member.controller;
 
 import com.surest.member.dto.MemberDto;
+import com.surest.member.exception.BusinessServiceException;
 import com.surest.member.service.MemberService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,7 @@ public class MemberController {
     // Build Add REST API
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MemberDto> addMember(@RequestBody MemberDto memberDto) {
+    public ResponseEntity<MemberDto> addMember(@RequestBody MemberDto memberDto) throws BusinessServiceException {
         MemberDto savedMember = memberService.createMember(memberDto);
         return new ResponseEntity<>(savedMember, HttpStatus.CREATED);
     }
@@ -67,7 +68,7 @@ public class MemberController {
     // Build Delete REST API
     @DeleteMapping("/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteMemberById(@PathVariable UUID uuid){
+    public ResponseEntity<String> deleteMemberById(@PathVariable UUID uuid) throws BusinessServiceException {
         memberService.deleteMemberById(uuid);
         return ResponseEntity.ok("Member Deleted Successfully");
     }

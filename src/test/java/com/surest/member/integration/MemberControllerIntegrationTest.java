@@ -1,6 +1,7 @@
-package com.surest.member.controller;
+package com.surest.member.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.surest.member.controller.MemberController;
 import com.surest.member.dto.MemberDto;
 import com.surest.member.jwt.JwtAuthenticationFilter;
 import com.surest.member.jwt.JwtTokenProvider;
@@ -10,7 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

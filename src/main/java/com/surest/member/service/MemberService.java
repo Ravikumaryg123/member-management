@@ -2,6 +2,7 @@ package com.surest.member.service;
 
 import com.surest.member.dto.MemberDto;
 import com.surest.member.entity.Member;
+import com.surest.member.exception.BusinessServiceException;
 import com.surest.member.exception.ResourceNotFound;
 import com.surest.member.mapper.MemberMapper;
 import com.surest.member.repository.MemberRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,10 @@ public class MemberService {
     private MemberRepository memberRepository;
 
     @Transactional
-    public MemberDto createMember(MemberDto memberDto) {
+    public MemberDto createMember(MemberDto memberDto) throws BusinessServiceException {
+        if (memberRepository.existsByEmail(memberDto.getEmail())) {
+            throw new BusinessServiceException("Email already exists", HttpStatus.CONFLICT);
+        }
         Member member = MemberMapper.mapToMember(memberDto);
         Member savedMember = memberRepository.save(member);
         return MemberMapper.mapToMemberDto(savedMember);
@@ -72,9 +77,10 @@ public class MemberService {
     }
 
     @Transactional
-    public void deleteMemberById(UUID uuid) {
-        Member member = memberRepository.findById(uuid)
-                .orElseThrow(() -> new ResourceNotFound("Member does not exist with the given Id "+uuid));
+    public void deleteMemberById(UUID uuid) throws BusinessServiceException {
+        if (!memberRepository.existsById(uuid)) {
+            throw new BusinessServiceException("Member not found", HttpStatus.NOT_FOUND);
+        }
         memberRepository.deleteById(uuid);
     }
 
